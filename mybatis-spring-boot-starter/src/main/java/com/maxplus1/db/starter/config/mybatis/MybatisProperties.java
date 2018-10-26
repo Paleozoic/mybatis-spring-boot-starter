@@ -15,9 +15,10 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 @Data
+@ConfigurationProperties(prefix = MybatisProperties.MYBATIS_PREFIX)
 public class MybatisProperties {
 
-    public static final String MYBATIS_PREFIX = "mybatis";
+    public static final String MYBATIS_PREFIX = "spring.maxplus1.mybatis";
 
     private static final ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
 

@@ -1,5 +1,7 @@
 package com.maxplus1.db.starter.config.mybatis.common.ctrl;
 
+import com.maxplus1.db.starter.config.mybatis.common.BaseData;
+import com.maxplus1.db.starter.config.mybatis.common.LogUtils;
 import org.slf4j.Logger;
 
 public class CtrlOpt {

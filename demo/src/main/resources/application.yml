@@ -1,0 +1,33 @@
+server:
+  servlet:
+    context-path: /demo/
+  port: 9000
+
+management:
+  port: 9001
+  address: 127.0.0.1
+
+spring:
+    autoconfigure:
+      exclude:
+        - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
+        - org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
+    maxplus1:
+      druid: # 公共属性
+        driver-class-name: org.h2.Driver
+        username: root
+        password: 123456
+        data-sources: # 数据源个性化配置
+          master: # 注册的DataSource名字为：masterDataSource
+            url: jdbc:h2:file:./master
+          slave:
+            url: jdbc:h2:file:./slave
+      mybatis: # 公共属性
+          configuration:
+              map-underscore-to-camel-case: true
+              default-fetch-size: 100
+              default-statement-timeout: 30
+          data-sources:
+            master: # 数据源+MyBatis个性化配置
+              type-aliases-package: com.example.domain.model
+              type-handlers-package: com.example.typehandler

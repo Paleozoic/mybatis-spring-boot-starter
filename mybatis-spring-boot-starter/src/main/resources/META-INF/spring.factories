@@ -1,5 +1,2 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-com.maxplus1.access.starter.config.shiro.ShiroRedisAutoConfiguration,\
-com.maxplus1.access.starter.config.shiro.SetSessionDAOAutoConfiguration,\
-com.maxplus1.db.starter.config.mybatis.MyBatisAutoConfiguration,\
-com.maxplus1.access.starter.config.shiro.WebMvcAutoConfiguration
+  com.maxplus1.db.starter.config.druid.DruidAutoConfiguration
