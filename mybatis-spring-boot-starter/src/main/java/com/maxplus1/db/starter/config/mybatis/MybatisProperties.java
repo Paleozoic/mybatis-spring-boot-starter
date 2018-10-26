@@ -1,3 +1,4 @@
+/*
 package com.maxplus1.db.starter.config.mybatis;
 
 import lombok.Data;
@@ -16,70 +17,92 @@ import java.util.stream.Stream;
 
 @Data
 @ConfigurationProperties(prefix = MybatisProperties.MYBATIS_PREFIX)
-public class MybatisProperties {
+ public class MybatisProperties {
 
     public static final String MYBATIS_PREFIX = "spring.maxplus1.mybatis";
 
     private static final ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
 
-    /**
+    */
+/**
      * Location of MyBatis xml config file.
-     */
+     *//*
+
     private String configLocation;
 
-    /**
+    */
+/**
      * Locations of MyBatis mapper files.
-     */
+     *//*
+
     private String[] mapperLocations;
 
-    /**
+    */
+/**
      * Packages to search type aliases. (Package delimiters are ",; \t\n")
-     */
+     *//*
+
     private String typeAliasesPackage;
 
-    /**
+    */
+/**
      * The super class for filtering type alias.
      * If this not specifies, the MyBatis deal as type alias all classes that searched from typeAliasesPackage.
-     */
+     *//*
+
     private Class<?> typeAliasesSuperType;
 
-    /**
+    */
+/**
      * Packages to search for type handlers. (Package delimiters are ",; \t\n")
-     */
+     *//*
+
     private String typeHandlersPackage;
 
-    /**
+    */
+/**
      * Indicates whether perform presence check of the MyBatis xml config file.
-     */
+     *//*
+
     private boolean checkConfigLocation = false;
 
-    /**
+    */
+/**
      * Execution mode for {@link org.mybatis.spring.SqlSessionTemplate}.
-     */
+     *//*
+
     private ExecutorType executorType;
 
-    /**
+    */
+/**
      * Externalized properties for MyBatis configuration.
-     */
+     *//*
+
     private Properties configurationProperties;
 
-    /**
+    */
+/**
      * A Configuration object for customize default settings. If {@link #configLocation}
      * is specified, this property is not used.
-     */
+     *//*
+
     @NestedConfigurationProperty
     private Configuration configuration;
 
-    /**
+    */
+/**
      * @since 1.1.0
-     */
+     *//*
+
     public String getConfigLocation() {
         return this.configLocation;
     }
 
-    /**
+    */
+/**
      * @since 1.1.0
-     */
+     *//*
+
     public void setConfigLocation(String configLocation) {
         this.configLocation = configLocation;
     }
@@ -108,16 +131,20 @@ public class MybatisProperties {
         this.typeAliasesPackage = typeAliasesPackage;
     }
 
-    /**
+    */
+/**
      * @since 1.3.3
-     */
+     *//*
+
     public Class<?> getTypeAliasesSuperType() {
         return typeAliasesSuperType;
     }
 
-    /**
+    */
+/**
      * @since 1.3.3
-     */
+     *//*
+
     public void setTypeAliasesSuperType(Class<?> typeAliasesSuperType) {
         this.typeAliasesSuperType = typeAliasesSuperType;
     }
@@ -138,16 +165,20 @@ public class MybatisProperties {
         this.executorType = executorType;
     }
 
-    /**
+    */
+/**
      * @since 1.2.0
-     */
+     *//*
+
     public Properties getConfigurationProperties() {
         return configurationProperties;
     }
 
-    /**
+    */
+/**
      * @since 1.2.0
-     */
+     *//*
+
     public void setConfigurationProperties(Properties configurationProperties) {
         this.configurationProperties = configurationProperties;
     }
@@ -175,3 +206,4 @@ public class MybatisProperties {
     }
 
 }
+*/

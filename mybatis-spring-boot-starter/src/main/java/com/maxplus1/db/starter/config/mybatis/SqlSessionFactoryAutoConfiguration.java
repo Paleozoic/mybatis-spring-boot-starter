@@ -35,9 +35,6 @@ import static java.util.Collections.emptyMap;
 public class SqlSessionFactoryAutoConfiguration {
 
 
-    @Autowired
-    private MybatisProperties mybatisProperties;
-
     /**
      * 多SQL会话工厂注册
      */
@@ -63,7 +60,7 @@ public class SqlSessionFactoryAutoConfiguration {
 
                 // 添加参数
                 BeanDefinition beanDefinition =
-                        genericSqlSessionFactoryBeanDefinition(camelName+Const.BEAN_SUFFIX.SqlSessionFactory.val());
+                        genericSqlSessionFactoryBeanDefinition(camelName);
 
                 registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.SqlSessionFactory.val(), beanDefinition);
 
@@ -72,6 +69,23 @@ public class SqlSessionFactoryAutoConfiguration {
 
 
     }
+
+
+    /**
+     * 构造 BeanDefinition，通过 MybatisProperties 实现继承 'spring.maxplus1.mybatis' 的配置
+     *
+     * @return BeanDefinition
+     */
+    private static BeanDefinition genericSqlSessionFactoryBeanDefinition(String camelName ) {
+        return BeanDefinitionBuilder.genericBeanDefinition(DefaultSqlSessionFactory.class)
+                .setInitMethodName("init")
+                .setDestroyMethodName("close")
+                .addPropertyReference("dataSource",camelName+Const.BEAN_SUFFIX.SqlSessionFactory.val())
+                .addPropertyReference("configuration",camelName+Const.BEAN_SUFFIX.MyBatisConfiguration.val())
+                .getBeanDefinition();
+    }
+
+
 
     /**
      * Bean 处理器，将各数据源的自定义配置绑定到 Bean
@@ -103,18 +117,6 @@ public class SqlSessionFactoryAutoConfiguration {
 
     }
 
-    /**
-     * 构造 BeanDefinition，通过 MybatisProperties 实现继承 'spring.maxplus1.mybatis' 的配置
-     *
-     * @return BeanDefinition
-     */
-    private static BeanDefinition genericSqlSessionFactoryBeanDefinition(String dataSourceBeanName ) {
-        return BeanDefinitionBuilder.genericBeanDefinition(DefaultSqlSessionFactory.class)
-                .setInitMethodName("init")
-                .setDestroyMethodName("close")
-                .addPropertyReference("dataSource",dataSourceBeanName)
-                .getBeanDefinition();
-    }
 
 
 

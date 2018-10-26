@@ -1,20 +1,17 @@
 package com.maxplus1.db.starter.config.mybatis;
 
 import com.maxplus1.db.starter.config.Const;
-import com.maxplus1.db.starter.config.druid.DruidDataSourceCustomizer;
 import com.maxplus1.db.starter.config.druid.utils.CharMatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
-import org.mybatis.spring.boot.autoconfigure.ConfigurationCustomizer;
+import org.mybatis.spring.boot.autoconfigure.MybatisProperties;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.ApplicationContext;
@@ -25,12 +22,7 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
-import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -38,24 +30,24 @@ import static java.util.Collections.emptyMap;
 
 @Import(MyBatisConfigurationAutoConfiguration.MyBatisConfigurationImportSelector.class)
 @Slf4j
-public class MyBatisConfigurationAutoConfiguration {
+@ConfigurationProperties(prefix = MyBatisConfigurationAutoConfiguration.MYBATIS_PREFIX)
+public class MyBatisConfigurationAutoConfiguration extends MybatisProperties {
 
-
-
+    public static final String MYBATIS_PREFIX = "spring.maxplus1.mybatis";
 
     /**
      * 多数据源的MyBatis配置注册
+     * 加载顺序：EnvironmentAware=>ImportBeanDefinitionRegistrar=>ApplicationContextAware
+     * 读取环境配置=》注册Bean=》生成上下文
      */
-    static class DynamicSqlSessionFactoryRegistrar implements ImportBeanDefinitionRegistrar, EnvironmentAware,ApplicationContextAware {
+    static class DynamicSqlSessionFactoryRegistrar implements EnvironmentAware,ImportBeanDefinitionRegistrar {
 
         /**
          * 多数据源属性配置 <dataSource,props>
          */
         private Map<String, Object> dataSources;
-        /**
-         * MyBatis的公共配置
-         */
-        private MybatisProperties mybatisProperties;
+
+
 
         @Override
         public void setEnvironment(Environment environment) {
@@ -66,26 +58,33 @@ public class MyBatisConfigurationAutoConfiguration {
 
         @Override
         public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+
             this.dataSources.keySet().forEach(dataSourceName -> {
                 // 注册 BeanDefinition
                 String dataSourceCamelName = CharMatcher.separatedToCamel().apply(dataSourceName);
 
                 // 注册MyBatis Configuration
                 BeanDefinition beanDefinition =
-                        genericMyBatisConfigurationBeanDefinition(mybatisProperties);
+                        genericMyBatisConfigurationBeanDefinition();
 
                 // TODO 个性化配置覆盖公共配置
 
-                registry.registerBeanDefinition(dataSourceCamelName+ Const.BEAN_SUFFIX.SqlSessionFactory.val(), beanDefinition);
+                registry.registerBeanDefinition(dataSourceCamelName + Const.BEAN_SUFFIX.MyBatisConfiguration.val(), beanDefinition);
 
             });
         }
 
 
-        @Override
-        public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-            this.mybatisProperties = applicationContext.getBean(MybatisProperties.class);
-        }
+    }
+
+    /**
+     * 构造 BeanDefinition，通过 MyBatisPropertiesWrapper 实现继承 'spring.maxplus1.mybatis' 的配置
+     *
+     * @return BeanDefinition
+     */
+    private static BeanDefinition genericMyBatisPropertiesWrapperBeanDefinition() {
+        return BeanDefinitionBuilder.genericBeanDefinition(MyBatisPropertiesWrapper.class)
+                .getBeanDefinition();
     }
 
 
@@ -96,6 +95,9 @@ public class MyBatisConfigurationAutoConfiguration {
      */
     private static BeanDefinition genericMyBatisConfigurationBeanDefinition(MybatisProperties mybatisProperties) {
         Configuration configuration = mybatisProperties.getConfiguration();
+        if(configuration==null){
+            configuration = new Configuration();
+        }
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(Configuration.class);
 
         beanDefinitionBuilder.addPropertyValue("safeRowBoundsEnabled",configuration.isSafeRowBoundsEnabled());

@@ -40,6 +40,8 @@ public class DruidDataSourceConfiguration {
 
     /**
      * 多数据源注册
+     * 加载顺序：EnvironmentAware=>ImportBeanDefinitionRegistrar=>ApplicationContextAware
+     * 读取环境配置=》注册Bean=》生成上下文
      *
      * @author trang
      */
