@@ -1,12 +1,12 @@
 package com.maxplus1.db.starter.config.mybatis;
 
-import com.maxplus1.db.starter.config.BeanUtils;
 import com.maxplus1.db.starter.config.Const;
 import com.maxplus1.db.starter.config.druid.utils.CharMatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -69,7 +69,10 @@ public class TransactionManagerAutoConfiguration {
      * @return BeanDefinition
      */
     private static BeanDefinition genericTransactionManagerBeanDefinition(String dataSourceBeanName) {
-        return BeanUtils.genericBeanDefinition(DataSourceTransactionManager.class,"dataSource",dataSourceBeanName);
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DataSourceTransactionManager.class);
+        beanDefinitionBuilder.addPropertyReference("dataSource",dataSourceBeanName);
+        return   beanDefinitionBuilder
+                .getBeanDefinition();
     }
 
 

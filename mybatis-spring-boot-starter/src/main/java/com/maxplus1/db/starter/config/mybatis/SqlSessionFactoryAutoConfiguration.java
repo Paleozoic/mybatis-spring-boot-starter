@@ -1,16 +1,18 @@
 package com.maxplus1.db.starter.config.mybatis;
 
-import com.maxplus1.db.starter.config.BeanUtils;
 import com.maxplus1.db.starter.config.Const;
 import com.maxplus1.db.starter.config.druid.DruidDataSourceCustomizer;
 import com.maxplus1.db.starter.config.druid.utils.CharMatcher;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
@@ -20,7 +22,6 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,7 @@ public class SqlSessionFactoryAutoConfiguration {
             this.dataSources.keySet().forEach(dataSourceName -> {
                 // 注册 BeanDefinition
                 String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
+
                 // 添加参数
                 BeanDefinition beanDefinition =
                         genericSqlSessionFactoryBeanDefinition(camelName+Const.BEAN_SUFFIX.SqlSessionFactory.val());
@@ -77,17 +79,10 @@ public class SqlSessionFactoryAutoConfiguration {
      */
     static class SqlSessionFactoryBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
 
-        private final List<DruidDataSourceCustomizer> customizers;
-        private Environment environment;
         private Map<String, Object> dataSources;
-
-        public SqlSessionFactoryBeanPostProcessor(ObjectProvider<List<DruidDataSourceCustomizer>> customizers) {
-            this.customizers = customizers.getIfAvailable(ArrayList::new);
-        }
 
         @Override
         public void setEnvironment(Environment environment) {
-            this.environment = environment;
             this.dataSources = Binder.get(environment)
                     .bind(Const.PROP_PREFIX.Druid.val(), Bindable.mapOf(String.class, Object.class))
                     .orElse(emptyMap());
@@ -113,9 +108,16 @@ public class SqlSessionFactoryAutoConfiguration {
      *
      * @return BeanDefinition
      */
-    private static BeanDefinition genericSqlSessionFactoryBeanDefinition(String dataSourceBeanName) {
-        return BeanUtils.genericBeanDefinition(SqlSessionFactory.class,"dataSource",dataSourceBeanName);
+    private static BeanDefinition genericSqlSessionFactoryBeanDefinition(String dataSourceBeanName ) {
+        return BeanDefinitionBuilder.genericBeanDefinition(DefaultSqlSessionFactory.class)
+                .setInitMethodName("init")
+                .setDestroyMethodName("close")
+                .addPropertyReference("dataSource",dataSourceBeanName)
+                .getBeanDefinition();
     }
+
+
+
 
 
     static class SqlSessionFactoryImportSelector implements ImportSelector, EnvironmentAware {

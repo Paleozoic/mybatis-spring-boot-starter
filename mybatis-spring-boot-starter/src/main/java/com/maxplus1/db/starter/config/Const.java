@@ -5,6 +5,7 @@ public class Const {
         TransactionManager("TransactionManager"),
         DataSource("DataSource"),
         SqlSessionFactory("SqlSessionFactory"),
+        MyBatisConfiguration("MyBatisConfiguration"),
         ;
 
         private String val;
