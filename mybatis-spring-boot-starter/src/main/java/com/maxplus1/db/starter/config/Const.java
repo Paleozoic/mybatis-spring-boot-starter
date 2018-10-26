@@ -4,6 +4,7 @@ public class Const {
     public enum BEAN_SUFFIX{
         TransactionManager("TransactionManager"),
         DataSource("DataSource"),
+        SqlSessionFactory("SqlSessionFactory"),
         ;
 
         private String val;

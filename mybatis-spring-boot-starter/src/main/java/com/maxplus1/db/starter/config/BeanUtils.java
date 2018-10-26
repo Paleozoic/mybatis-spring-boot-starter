@@ -37,4 +37,18 @@ public class BeanUtils {
         propRefMap.put(name,beanName);
         return BeanUtils.genericBeanDefinition(clzz,propRefMap);
     }
+
+
+
+    public static BeanDefinition genericBeanDefinitionPropVal(Class clzz,Map<String,Object> propRefMap) {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(clzz);
+
+        propRefMap.forEach((name,beanName)->{
+            beanDefinitionBuilder.addPropertyValue(name,beanName);
+        });
+
+        return   beanDefinitionBuilder.setInitMethodName("init")
+                .setDestroyMethodName("close")
+                .getBeanDefinition();
+    }
 }

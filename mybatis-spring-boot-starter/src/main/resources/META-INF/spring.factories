@@ -1,2 +1,3 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-  com.maxplus1.db.starter.config.druid.DruidAutoConfiguration
+  com.maxplus1.db.starter.config.druid.DruidAutoConfiguration,\
+  com.maxplus1.db.starter.config.mybatis.MybatisAutoConfiguration

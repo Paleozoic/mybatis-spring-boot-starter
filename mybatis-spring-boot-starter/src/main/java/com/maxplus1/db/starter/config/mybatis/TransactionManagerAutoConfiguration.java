@@ -3,20 +3,28 @@ package com.maxplus1.db.starter.config.mybatis;
 import com.maxplus1.db.starter.config.BeanUtils;
 import com.maxplus1.db.starter.config.Const;
 import com.maxplus1.db.starter.config.druid.utils.CharMatcher;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.bind.Bindable;
 import org.springframework.boot.context.properties.bind.Binder;
 import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 
 import java.util.Map;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyMap;
 
+@Import(TransactionManagerAutoConfiguration.TransactionManagerImportSelector.class)
+@Slf4j
 public class TransactionManagerAutoConfiguration {
 
 
@@ -64,6 +72,56 @@ public class TransactionManagerAutoConfiguration {
         return BeanUtils.genericBeanDefinition(DataSourceTransactionManager.class,"dataSource",dataSourceBeanName);
     }
 
+
+
+    /**
+     * Bean 处理器，将各数据源的自定义配置绑定到 Bean
+     *
+     */
+    static class TransactionManagerBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
+
+
+
+
+        @Override
+        public void setEnvironment(Environment environment) {
+
+        }
+
+        @Override
+        public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+            if (bean instanceof DataSourceTransactionManager) {
+                System.out.println(bean);
+            }
+            return bean;
+        }
+
+        @Override
+        public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+            return bean;
+        }
+
+    }
+
+
+
+
+    static class TransactionManagerImportSelector implements ImportSelector, EnvironmentAware {
+
+
+        @Override
+        public void setEnvironment(Environment environment) {
+
+        }
+
+        @Override
+        public String[] selectImports(AnnotationMetadata metadata) {
+            Stream.Builder<Class<?>> imposts = Stream.<Class<?>>builder().add(TransactionManagerAutoConfiguration.TransactionManagerBeanPostProcessor.class);
+            imposts.add(TransactionManagerAutoConfiguration.DynamicTransactionManagerRegistrar.class);
+            return imposts.build().map(Class::getName).toArray(String[]::new);
+        }
+
+    }
 
 
 }
