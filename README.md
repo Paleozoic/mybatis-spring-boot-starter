@@ -17,3 +17,6 @@ public Map<String,Bean> manyBeans(){
 ```
 
 详情看我提的 [Issue](https://github.com/spring-projects/spring-boot/issues/14978)
+
+# PS
+多数据源的注入已经实现
