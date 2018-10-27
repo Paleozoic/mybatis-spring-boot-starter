@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Import;
 
 @Configuration
 @ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
-@EnableConfigurationProperties(MybatisProperties.class)
+@EnableConfigurationProperties(MyBatisPropertiesWrapper.class)
 @Import({MyBatisPropertiesWrapper.class,TransactionManagerAutoConfiguration.class,SqlSessionFactoryAutoConfiguration.class})
 public class MybatisAutoConfiguration {
 

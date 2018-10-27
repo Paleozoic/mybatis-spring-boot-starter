@@ -65,7 +65,7 @@ public class MyBatisConfigurationAutoConfiguration extends MybatisProperties {
 
                 // 注册MyBatis Configuration
                 BeanDefinition beanDefinition =
-                        genericMyBatisConfigurationBeanDefinition();
+                        genericMyBatisPropertiesWrapperBeanDefinition();
 
                 // TODO 个性化配置覆盖公共配置
 
