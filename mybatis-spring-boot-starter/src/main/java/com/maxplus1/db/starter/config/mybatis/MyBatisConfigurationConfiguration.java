@@ -1,15 +1,12 @@
 package com.maxplus1.db.starter.config.mybatis;
 
+import com.maxplus1.db.starter.config.BeanCustomizer;
 import com.maxplus1.db.starter.config.Const;
-import com.maxplus1.db.starter.config.druid.DruidDataSourceCustomizer;
 import com.maxplus1.db.starter.config.druid.utils.CharMatcher;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.Configuration;
-import org.apache.ibatis.session.SqlSessionFactory;
-import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
@@ -30,20 +27,25 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyMap;
 
-@Import(SqlSessionFactoryAutoConfiguration.SqlSessionFactoryImportSelector.class)
+@Import(MyBatisConfigurationConfiguration.MyBatisConfigurationImportSelector.class)
 @Slf4j
-public class SqlSessionFactoryAutoConfiguration {
+public class MyBatisConfigurationConfiguration  {
 
 
     /**
-     * 多SQL会话工厂注册
+     * 多数据源的MyBatis配置注册
+     * 加载顺序：EnvironmentAware=>ImportBeanDefinitionRegistrar=>ApplicationContextAware
+     * 读取环境配置=》注册Bean=》生成上下文
      */
-    static class DynamicSqlSessionFactoryRegistrar implements ImportBeanDefinitionRegistrar, EnvironmentAware {
+    static class DynamicMyBatisConfigurationRegistrar implements EnvironmentAware,ImportBeanDefinitionRegistrar {
 
         /**
          * 多数据源属性配置 <dataSource,props>
+         * props是个性化配置
          */
         private Map<String, Object> dataSources;
+
+
 
         @Override
         public void setEnvironment(Environment environment) {
@@ -54,15 +56,16 @@ public class SqlSessionFactoryAutoConfiguration {
 
         @Override
         public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+
             this.dataSources.keySet().forEach(dataSourceName -> {
                 // 注册 BeanDefinition
-                String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
+                String dataSourceCamelName = CharMatcher.separatedToCamel().apply(dataSourceName);
 
-                // 添加参数
+                // 注册MyBatis Configuration
                 BeanDefinition beanDefinition =
-                        genericSqlSessionFactoryBeanDefinition(camelName);
+                        genericMyBatisConfigurationBeanDefinition();
 
-                registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.SqlSessionFactory.val(), beanDefinition);
+                registry.registerBeanDefinition(dataSourceCamelName + Const.BEAN_SUFFIX.MyBatisConfiguration.val(), beanDefinition);
 
             });
         }
@@ -70,48 +73,59 @@ public class SqlSessionFactoryAutoConfiguration {
 
     }
 
-
     /**
-     * 构造 BeanDefinition，通过 MybatisProperties 实现继承 'spring.maxplus1.mybatis' 的配置
+     * 构造 BeanDefinition，通过 ConfigurationWrapper 实现继承 'spring.maxplus1.mybatis' 的配置
      *
      * @return BeanDefinition
      */
-    private static BeanDefinition genericSqlSessionFactoryBeanDefinition(String camelName ) {
-        return BeanDefinitionBuilder.genericBeanDefinition(DefaultSqlSessionFactory.class)
-                .setInitMethodName("init")
-                .setDestroyMethodName("close")
-                .addPropertyReference("dataSource",camelName+Const.BEAN_SUFFIX.SqlSessionFactory.val())
-                .addPropertyReference("configuration",camelName+Const.BEAN_SUFFIX.MyBatisConfiguration.val())
+    private static BeanDefinition genericMyBatisConfigurationBeanDefinition() {
+        return BeanDefinitionBuilder.genericBeanDefinition(ConfigurationWrapper.class)
                 .getBeanDefinition();
     }
-
 
 
     /**
      * Bean 处理器，将各数据源的自定义配置绑定到 Bean
      *
      */
-    static class SqlSessionFactoryBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
+    static class MyBatisConfigurationBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
 
+        private final List<BeanCustomizer<Configuration>> customizers;
+        private Environment environment;
         private Map<String, Object> dataSources;
+
+        public MyBatisConfigurationBeanPostProcessor(ObjectProvider<List<BeanCustomizer<Configuration>>> customizers) {
+            this.customizers = customizers.getIfAvailable(ArrayList::new);
+        }
 
         @Override
         public void setEnvironment(Environment environment) {
+            this.environment = environment;
             this.dataSources = Binder.get(environment)
                     .bind(Const.PROP_PREFIX.Druid.val(), Bindable.mapOf(String.class, Object.class))
                     .orElse(emptyMap());
         }
 
+        /**
+         * Bean初始化之前的拦截器，会遍历所有的Bean
+         *
+         * @param bean
+         * @param beanName
+         * @return
+         * @throws BeansException
+         */
         @Override
         public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-            if (bean instanceof SqlSessionFactory) {
-                System.out.println(bean);
+            if (bean instanceof Configuration) {
+                // 设置 Druid 名称
+                Configuration configuration = (Configuration) bean;
+                // 将 'spring.maxplus1.mybatis.data-sources.${name}' 的配置绑定到 Bean
+                if (!dataSources.isEmpty()) {
+                    Binder.get(environment).bind(Const.PROP_PREFIX.MyBatis.val() + "." + beanName, Bindable.ofInstance(configuration));
+                }
+                // 定制化配置，拥有最高优先级，会覆盖之前已有的配置
+                customizers.forEach(customizer -> customizer.customize(configuration));
             }
-            return bean;
-        }
-
-        @Override
-        public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
             return bean;
         }
 
@@ -121,8 +135,7 @@ public class SqlSessionFactoryAutoConfiguration {
 
 
 
-
-    static class SqlSessionFactoryImportSelector implements ImportSelector, EnvironmentAware {
+    static class MyBatisConfigurationImportSelector implements ImportSelector, EnvironmentAware {
 
 
         @Override
@@ -132,13 +145,13 @@ public class SqlSessionFactoryAutoConfiguration {
 
         @Override
         public String[] selectImports(AnnotationMetadata metadata) {
-            Stream.Builder<Class<?>> imposts = Stream.<Class<?>>builder().add(SqlSessionFactoryBeanPostProcessor.class);
-            imposts.add(DynamicSqlSessionFactoryRegistrar.class);
+            Stream.Builder<Class<?>> imposts = Stream.<Class<?>>builder().add(MyBatisConfigurationConfiguration.MyBatisConfigurationBeanPostProcessor.class);
+            imposts.add(DynamicMyBatisConfigurationRegistrar.class);
             return imposts.build().map(Class::getName).toArray(String[]::new);
         }
 
-    }
 
+    }
 
 
 }

@@ -31,3 +31,4 @@ spring:
             master: # 数据源+MyBatis个性化配置
               type-aliases-package: com.example.domain.model
               type-handlers-package: com.example.typehandler
+              mapper-locations: xxx

@@ -17,15 +17,16 @@ import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.util.StringUtils;
 
 import java.util.Map;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyMap;
 
-@Import(TransactionManagerAutoConfiguration.TransactionManagerImportSelector.class)
+@Import(TransactionManagerConfiguration.TransactionManagerImportSelector.class)
 @Slf4j
-public class TransactionManagerAutoConfiguration {
+public class TransactionManagerConfiguration {
 
 
 
@@ -54,6 +55,10 @@ public class TransactionManagerAutoConfiguration {
                 // 添加数据源
                 BeanDefinition beanDefinition =
                         genericTransactionManagerBeanDefinition(camelName+Const.BEAN_SUFFIX.DataSource.val());
+                // 注册以 DataSource Name 为别名的TransactionManager  用于@Transactional
+                if (!StringUtils.endsWithIgnoreCase(camelName, Const.BEAN_SUFFIX.DataSource.val())) {
+                    registry.registerAlias(camelName+Const.BEAN_SUFFIX.DataSource.val(), camelName);
+                }
                 registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.TransactionManager.val(), beanDefinition);
 
             });
@@ -119,8 +124,8 @@ public class TransactionManagerAutoConfiguration {
 
         @Override
         public String[] selectImports(AnnotationMetadata metadata) {
-            Stream.Builder<Class<?>> imposts = Stream.<Class<?>>builder().add(TransactionManagerAutoConfiguration.TransactionManagerBeanPostProcessor.class);
-            imposts.add(TransactionManagerAutoConfiguration.DynamicTransactionManagerRegistrar.class);
+            Stream.Builder<Class<?>> imposts = Stream.<Class<?>>builder().add(TransactionManagerConfiguration.TransactionManagerBeanPostProcessor.class);
+            imposts.add(TransactionManagerConfiguration.DynamicTransactionManagerRegistrar.class);
             return imposts.build().map(Class::getName).toArray(String[]::new);
         }
 

@@ -1,10 +1,11 @@
-package com.maxplus1.db.starter.config.druid;
+package com.maxplus1.db.starter.config.mybatis;
 
-import com.alibaba.druid.pool.DruidDataSource;
 import com.maxplus1.db.starter.config.BeanCustomizer;
 import com.maxplus1.db.starter.config.Const;
 import com.maxplus1.db.starter.config.druid.utils.CharMatcher;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.apache.ibatis.session.defaults.DefaultSqlSessionFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -24,35 +25,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
-import java.util.stream.Stream.Builder;
 
 import static java.util.Collections.emptyMap;
 
-/**
- * Druid 数据源配置
- *
- * @author trang
- */
-@Import(DruidDataSourceConfiguration.DruidDataSourceImportSelector.class)
+@Import(SqlSessionFactoryConfiguration.SqlSessionFactoryImportSelector.class)
 @Slf4j
-public class DruidDataSourceConfiguration {
+public class SqlSessionFactoryConfiguration {
 
 
     /**
-     * 多数据源注册
-     * 加载顺序：EnvironmentAware=>ImportBeanDefinitionRegistrar=>ApplicationContextAware
-     * 读取环境配置=》注册Bean=》生成上下文
-     *
-     * @author trang
+     * 多SQL会话工厂注册
      */
-    static class DynamicDataSourceRegistrar implements ImportBeanDefinitionRegistrar, EnvironmentAware {
+    static class DynamicSqlSessionFactoryRegistrar implements ImportBeanDefinitionRegistrar, EnvironmentAware {
 
+        /**
+         * 多数据源属性配置 <dataSource,props>
+         */
         private Map<String, Object> dataSources;
 
         @Override
         public void setEnvironment(Environment environment) {
             this.dataSources = Binder.get(environment)
-                    .bind(Const.PROP_PREFIX.Druid.val(), Bindable.mapOf(String.class, Object.class))
+                    .bind(Const.PROP_PREFIX.MyBatis.val(), Bindable.mapOf(String.class, Object.class))
                     .orElse(emptyMap());
         }
 
@@ -61,37 +55,45 @@ public class DruidDataSourceConfiguration {
             this.dataSources.keySet().forEach(dataSourceName -> {
                 // 注册 BeanDefinition
                 String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
-                registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.DataSource.val(), genericDruidBeanDefinition());
+
+                // 添加参数
+                BeanDefinition beanDefinition =
+                        genericSqlSessionFactoryBeanDefinition(camelName);
+
+                registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.SqlSessionFactory.val(), beanDefinition);
+
             });
         }
 
+
     }
 
+
     /**
-     * 构造 BeanDefinition，通过 DruidDataSourceWrapper 实现继承 'spring.maxplus1.druid' 的配置
+     * 构造 BeanDefinition，通过 MybatisProperties 实现继承 'spring.maxplus1.mybatis' 的配置
      *
-     * @return BeanDefinition druidBeanDefinition
+     * @return BeanDefinition
      */
-    private static BeanDefinition genericDruidBeanDefinition() {
-        return BeanDefinitionBuilder.genericBeanDefinition(DruidDataSourceWrapper.class)
-                .setInitMethodName("init")
-                .setDestroyMethodName("close")
+    private static BeanDefinition genericSqlSessionFactoryBeanDefinition(String camelName ) {
+        return BeanDefinitionBuilder.genericBeanDefinition(DefaultSqlSessionFactory.class)
+                .addPropertyReference("dataSource",camelName+Const.BEAN_SUFFIX.DataSource.val())
+                .addPropertyReference("configuration",camelName+Const.BEAN_SUFFIX.MyBatisConfiguration.val())
                 .getBeanDefinition();
     }
 
 
-    /**
-     * DruidDataSource 的 Bean 处理器，将各数据源的自定义配置绑定到 Bean
-     *
-     * @author trang
-     */
-    static class DruidDataSourceBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
 
-        private final List<BeanCustomizer<DruidDataSource>> customizers;
+    /**
+     * Bean 处理器，将各数据源的自定义配置绑定到 Bean
+     *
+     */
+    static class SqlSessionFactoryBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
+
+        private final List<BeanCustomizer<SqlSessionFactory>> customizers;
         private Environment environment;
         private Map<String, Object> dataSources;
 
-        public DruidDataSourceBeanPostProcessor(ObjectProvider<List<BeanCustomizer<DruidDataSource>>> customizers) {
+        public SqlSessionFactoryBeanPostProcessor(ObjectProvider<List<BeanCustomizer<SqlSessionFactory>>> customizers) {
             this.customizers = customizers.getIfAvailable(ArrayList::new);
         }
 
@@ -105,16 +107,15 @@ public class DruidDataSourceConfiguration {
 
         @Override
         public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-            if (bean instanceof DruidDataSource) {
-                // 设置 Druid 名称
-                DruidDataSource druidDataSource = (DruidDataSource) bean;
-                druidDataSource.setName(beanName);
+            if (bean instanceof SqlSessionFactory) {
+                // 获取SqlSessionFactory
+                SqlSessionFactory sqlSessionFactory = (SqlSessionFactory) bean;
                 // 将 'spring.maxplus1.druid.data-sources.${name}' 的配置绑定到 Bean
                 if (!dataSources.isEmpty()) {
-                    Binder.get(environment).bind(Const.PROP_PREFIX.Druid.val() + "." + beanName, Bindable.ofInstance(druidDataSource));
+                    Binder.get(environment).bind(Const.PROP_PREFIX.MyBatis.val() + "." + beanName, Bindable.ofInstance(sqlSessionFactory));
                 }
                 // 定制化配置，拥有最高优先级，会覆盖之前已有的配置
-                customizers.forEach(customizer -> customizer.customize(druidDataSource));
+                customizers.forEach(customizer -> customizer.customize(sqlSessionFactory));
             }
             return bean;
         }
@@ -124,16 +125,15 @@ public class DruidDataSourceConfiguration {
             return bean;
         }
 
+
     }
 
-    /**
-     * 数据源选择器
-     * 当配置文件中存在 spring.datasource.druid.data-sources 属性时为多数据源
-     * 不存在则为单数据源
-     *
-     * @author trang
-     */
-    static class DruidDataSourceImportSelector implements ImportSelector, EnvironmentAware {
+
+
+
+
+
+    static class SqlSessionFactoryImportSelector implements ImportSelector, EnvironmentAware {
 
 
         @Override
@@ -143,11 +143,13 @@ public class DruidDataSourceConfiguration {
 
         @Override
         public String[] selectImports(AnnotationMetadata metadata) {
-            Builder<Class<?>> imposts = Stream.<Class<?>>builder().add(DruidDataSourceBeanPostProcessor.class);
-            imposts.add(DynamicDataSourceRegistrar.class);
+            Stream.Builder<Class<?>> imposts = Stream.<Class<?>>builder().add(SqlSessionFactoryBeanPostProcessor.class);
+            imposts.add(DynamicSqlSessionFactoryRegistrar.class);
             return imposts.build().map(Class::getName).toArray(String[]::new);
         }
 
     }
+
+
 
 }

@@ -1,6 +1,6 @@
 package com.maxplus1.db.starter.config.mybatis.common.datasource;
 
-import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
+//import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.AutoMappingBehavior;
 import org.apache.ibatis.session.ExecutorType;
@@ -28,13 +28,13 @@ public class MaxplusdbConfig {
 
     private final String beanName = "maxplusdb";
 
-    @Primary
-//    @Bean(name = "maxplusdb")
-    @Bean(name = beanName)
-    @ConfigurationProperties(prefix = "spring.datasource.druid.maxplusdb")
-    public DataSource dataSource() {
-        return DruidDataSourceBuilder.create().build();
-    }
+//    @Primary
+////    @Bean(name = "maxplusdb")
+//    @Bean(name = beanName)
+//    @ConfigurationProperties(prefix = "spring.datasource.druid.maxplusdb")
+//    public DataSource dataSource() {
+//        return DruidDataSourceBuilder.create().build();
+//    }
 
     @Primary
     @Bean(name = "maxplusdbTransactionManager")

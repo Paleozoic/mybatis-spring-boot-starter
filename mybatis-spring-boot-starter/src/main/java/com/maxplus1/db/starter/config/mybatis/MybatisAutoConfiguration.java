@@ -3,15 +3,13 @@ package com.maxplus1.db.starter.config.mybatis;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Import;
 
 
 @Configuration
 @ConditionalOnClass({ SqlSessionFactory.class, SqlSessionFactoryBean.class })
-@EnableConfigurationProperties(MyBatisPropertiesWrapper.class)
-@Import({MyBatisPropertiesWrapper.class,TransactionManagerAutoConfiguration.class,SqlSessionFactoryAutoConfiguration.class})
+@Import({TransactionManagerConfiguration.class,SqlSessionFactoryConfiguration.class})
 public class MybatisAutoConfiguration {
 
 
