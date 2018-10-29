@@ -1,4 +1,4 @@
-package com.maxplus1.db.starter.config.druid.utils;
+package com.maxplus1.db.starter.config.utils;
 
 import org.springframework.util.StringUtils;
 

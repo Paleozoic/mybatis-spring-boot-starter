@@ -2,7 +2,8 @@ package com.maxplus1.db.starter.config.mybatis;
 
 import com.maxplus1.db.starter.config.BeanCustomizer;
 import com.maxplus1.db.starter.config.Const;
-import com.maxplus1.db.starter.config.druid.utils.CharMatcher;
+import com.maxplus1.db.starter.config.utils.CharMatcher;
+import com.maxplus1.db.starter.config.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.Configuration;
 import org.springframework.beans.BeansException;
@@ -121,7 +122,7 @@ public class MyBatisConfigurationConfiguration  {
                 Configuration configuration = (Configuration) bean;
                 // 将 'spring.maxplus1.mybatis.data-sources.${name}' 的配置绑定到 Bean
                 if (!dataSources.isEmpty()) {
-                    Binder.get(environment).bind(Const.PROP_PREFIX.MyBatis.val() + "." + beanName, Bindable.ofInstance(configuration));
+                    Binder.get(environment).bind(Const.PROP_PREFIX.MyBatis.val() + "." + StringUtils.getFirstCamelName(beanName), Bindable.ofInstance(configuration));
                 }
                 // 定制化配置，拥有最高优先级，会覆盖之前已有的配置
                 customizers.forEach(customizer -> customizer.customize(configuration));

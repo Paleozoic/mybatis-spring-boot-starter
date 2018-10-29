@@ -3,6 +3,8 @@ package com.maxplus1.db.starter.config.mybatis;
 import com.maxplus1.db.starter.config.Const;
 import com.maxplus1.db.starter.config.utils.CharMatcher;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
@@ -16,7 +18,6 @@ import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.context.annotation.ImportSelector;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
@@ -24,16 +25,16 @@ import java.util.stream.Stream;
 
 import static java.util.Collections.emptyMap;
 
-@Import(TransactionManagerConfiguration.TransactionManagerImportSelector.class)
+@Import(SqlSessionTemplateConfiguration.SqlSessionTemplateImportSelector.class)
 @Slf4j
-public class TransactionManagerConfiguration {
+public class SqlSessionTemplateConfiguration {
 
 
 
     /**
      * 多事务管理器注册
      */
-    static class DynamicTransactionManagerRegistrar implements ImportBeanDefinitionRegistrar, EnvironmentAware {
+    static class DynamicSqlSessionTemplateRegistrar implements ImportBeanDefinitionRegistrar, EnvironmentAware {
 
         /**
          * 多数据源属性配置
@@ -54,12 +55,12 @@ public class TransactionManagerConfiguration {
                 String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
                 // 添加数据源
                 BeanDefinition beanDefinition =
-                        genericTransactionManagerBeanDefinition(camelName+Const.BEAN_SUFFIX.DataSource.val());
-                // 注册以 DataSource Name 为别名的TransactionManager  用于@Transactional
+                        genericSqlSessionTemplateBeanDefinition(camelName+Const.BEAN_SUFFIX.DataSource.val());
+                // 注册以 DataSource Name 为别名的SqlSessionTemplate  用于@Transactional
                 if (!StringUtils.endsWithIgnoreCase(camelName, Const.BEAN_SUFFIX.DataSource.val())) {
                     registry.registerAlias(camelName+Const.BEAN_SUFFIX.DataSource.val(), camelName);
                 }
-                registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.TransactionManager.val(), beanDefinition);
+                registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.SqlSessionTemplate.val(), beanDefinition);
 
             });
         }
@@ -69,13 +70,13 @@ public class TransactionManagerConfiguration {
 
 
     /**
-     * 构造 BeanDefinition，通过 MybatisProperties 实现继承 'spring.maxplus1.mybatis' 的配置
+     * 构造 BeanDefinition
      *
      * @return BeanDefinition
      */
-    private static BeanDefinition genericTransactionManagerBeanDefinition(String dataSourceBeanName) {
-        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(DataSourceTransactionManager.class);
-        beanDefinitionBuilder.addPropertyReference("dataSource",dataSourceBeanName);
+    private static BeanDefinition genericSqlSessionTemplateBeanDefinition(String sqlSessionFactoryBeanName) {
+        BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SqlSessionTemplate.class);
+        beanDefinitionBuilder.addPropertyReference("sqlSessionFactory",sqlSessionFactoryBeanName);
         return   beanDefinitionBuilder
                 .getBeanDefinition();
     }
@@ -86,7 +87,7 @@ public class TransactionManagerConfiguration {
      * Bean 处理器，将各数据源的自定义配置绑定到 Bean
      *
      */
-    static class TransactionManagerBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
+    static class SqlSessionTemplateBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
 
 
 
@@ -98,8 +99,8 @@ public class TransactionManagerConfiguration {
 
         @Override
         public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-            if (bean instanceof DataSourceTransactionManager) {
-                log.info("[INFO===>>>]inject the bean DataSourceTransactionManager[{}]",beanName);
+            if (bean instanceof SqlSessionTemplate) {
+                log.info("[INFO===>>>]inject the bean SqlSessionTemplate[{}]",beanName);
             }
             return bean;
         }
@@ -114,7 +115,7 @@ public class TransactionManagerConfiguration {
 
 
 
-    static class TransactionManagerImportSelector implements ImportSelector, EnvironmentAware {
+    static class SqlSessionTemplateImportSelector implements ImportSelector, EnvironmentAware {
 
 
         @Override
@@ -124,8 +125,8 @@ public class TransactionManagerConfiguration {
 
         @Override
         public String[] selectImports(AnnotationMetadata metadata) {
-            Stream.Builder<Class<?>> imposts = Stream.<Class<?>>builder().add(TransactionManagerConfiguration.TransactionManagerBeanPostProcessor.class);
-            imposts.add(TransactionManagerConfiguration.DynamicTransactionManagerRegistrar.class);
+            Stream.Builder<Class<?>> imposts = Stream.<Class<?>>builder().add(SqlSessionTemplateConfiguration.SqlSessionTemplateBeanPostProcessor.class);
+            imposts.add(SqlSessionTemplateConfiguration.DynamicSqlSessionTemplateRegistrar.class);
             return imposts.build().map(Class::getName).toArray(String[]::new);
         }
 

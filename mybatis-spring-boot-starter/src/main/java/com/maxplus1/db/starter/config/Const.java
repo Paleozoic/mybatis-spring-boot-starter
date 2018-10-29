@@ -6,6 +6,7 @@ public class Const {
         DataSource("DataSource"),
         SqlSessionFactory("SqlSessionFactory"),
         MyBatisConfiguration("MyBatisConfiguration"),
+        SqlSessionTemplate("SqlSessionTemplate"),
         ;
 
         private String val;
