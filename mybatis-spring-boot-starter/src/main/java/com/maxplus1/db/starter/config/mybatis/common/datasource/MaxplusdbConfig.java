@@ -1,3 +1,4 @@
+/*
 package com.maxplus1.db.starter.config.mybatis.common.datasource;
 
 //import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
@@ -81,3 +82,4 @@ public class MaxplusdbConfig {
         return factoryBean.getObject();
     }
 }
+*/

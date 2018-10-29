@@ -17,7 +17,7 @@ public class StringUtils {
                 ch[j] = (char) (camelName.charAt(i));
             } else {
                 //匹配到大写字母，退出
-                continue;
+                break;
             }
         }
         return new String(ch).trim();
