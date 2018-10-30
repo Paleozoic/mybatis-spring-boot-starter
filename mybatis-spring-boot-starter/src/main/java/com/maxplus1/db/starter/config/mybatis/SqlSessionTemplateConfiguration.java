@@ -3,7 +3,6 @@ package com.maxplus1.db.starter.config.mybatis;
 import com.maxplus1.db.starter.config.Const;
 import com.maxplus1.db.starter.config.utils.CharMatcher;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -55,7 +54,7 @@ public class SqlSessionTemplateConfiguration {
                 String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
                 // 添加数据源
                 BeanDefinition beanDefinition =
-                        genericSqlSessionTemplateBeanDefinition(camelName+Const.BEAN_SUFFIX.DataSource.val());
+                        genericSqlSessionTemplateBeanDefinition(camelName+Const.BEAN_SUFFIX.SqlSessionFactory.val());
                 // 注册以 DataSource Name 为别名的SqlSessionTemplate  用于@Transactional
                 if (!StringUtils.endsWithIgnoreCase(camelName, Const.BEAN_SUFFIX.DataSource.val())) {
                     registry.registerAlias(camelName+Const.BEAN_SUFFIX.DataSource.val(), camelName);
@@ -71,12 +70,13 @@ public class SqlSessionTemplateConfiguration {
 
     /**
      * 构造 BeanDefinition
+     * 构造器方法注入
      *
      * @return BeanDefinition
      */
     private static BeanDefinition genericSqlSessionTemplateBeanDefinition(String sqlSessionFactoryBeanName) {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SqlSessionTemplate.class);
-        beanDefinitionBuilder.addPropertyReference("sqlSessionFactory",sqlSessionFactoryBeanName);
+        beanDefinitionBuilder.addConstructorArgReference(sqlSessionFactoryBeanName);
         return   beanDefinitionBuilder
                 .getBeanDefinition();
     }

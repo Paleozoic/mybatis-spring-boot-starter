@@ -74,6 +74,25 @@ public class SqlSessionFactoryConfiguration {
     }
 
     /**
+     * SqlSessionFactoryBean  beanFactory.getBean("工厂方法BeanId")会得到工厂生成的真正Bean，而不是工厂本身
+     * 如果需要获取工厂本身，则需要使用：FACTORY_BEAN_PREFIX = "&"
+     * factory.getBean("&工厂方法BeanId")会得到工厂Bean
+     * 在org.springframework.beans.factory.support.ConstructorResolver#instantiateUsingFactoryMethod  工厂方法注入
+     * 获取的是产品Bean，而不是工厂Bean本身，注意！
+     * String factoryBeanName = mbd.getFactoryBeanName();
+         if (factoryBeanName != null) {
+         if (factoryBeanName.equals(beanName)) {
+         throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
+         "factory-bean reference points back to the same bean definition");
+         }
+         factoryBean = this.beanFactory.getBean(factoryBeanName);
+         if (mbd.isSingleton() && this.beanFactory.containsSingleton(beanName)) {
+         throw new ImplicitlyAppearedSingletonException();
+         }
+         factoryClass = factoryBean.getClass();
+         isStatic = false;
+         }
+     *
      * @param camelName
      * @return
      */
@@ -86,13 +105,13 @@ public class SqlSessionFactoryConfiguration {
 
 
     /**
-     * 构造 BeanDefinition，通过工厂实例生成Bean
+     * 构造 BeanDefinition，通过工厂实例生成Bean  SqlSessionFactory
      *
      * @return BeanDefinition
      */
     private static BeanDefinition genericSqlSessionFactoryBeanDefinition(String camelName ) {
         return BeanDefinitionBuilder.genericBeanDefinition(DefaultSqlSessionFactory.class)
-                .setFactoryMethodOnBean("getObject",camelName+Const.BEAN_SUFFIX.SqlSessionFactoryBean.val())
+                .setFactoryMethodOnBean("getObject","&"+camelName+Const.BEAN_SUFFIX.SqlSessionFactoryBean.val())
                 .getBeanDefinition();
     }
 
