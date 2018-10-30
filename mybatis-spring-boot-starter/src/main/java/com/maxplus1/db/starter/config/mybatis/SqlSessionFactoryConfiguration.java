@@ -74,7 +74,7 @@ public class SqlSessionFactoryConfiguration {
 
 
     /**
-     * 构造 BeanDefinition，通过 MybatisProperties 实现继承 'spring.maxplus1.mybatis' 的配置
+     * 构造 BeanDefinition，通过工厂实例生成Bean
      *
      * @return BeanDefinition
      */
@@ -90,7 +90,7 @@ public class SqlSessionFactoryConfiguration {
      * @return
      */
     private static BeanDefinition genericSqlSessionFactoryBeanBeanDefinition(String camelName ) {
-        return BeanDefinitionBuilder.genericBeanDefinition(SqlSessionFactoryBean.class)
+        return BeanDefinitionBuilder.genericBeanDefinition(SqlSessionFactoryBeanWrapper.class)
                 .addPropertyReference("dataSource",camelName+Const.BEAN_SUFFIX.DataSource.val())
                 .addPropertyReference("configuration",camelName+Const.BEAN_SUFFIX.MyBatisConfiguration.val())
                 .getBeanDefinition();

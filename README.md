@@ -17,6 +17,6 @@ public Map<String,Bean> manyBeans(){
 ```
 
 详情看我提的 [Issue](https://github.com/spring-projects/spring-boot/issues/14978)
-
+https://jira.spring.io/browse/SPR-17441
 # PS
 多数据源的注入已经实现

@@ -33,9 +33,17 @@
         </dependency>
 
         <!-- mybatis支持 -->
+        <!--<dependency>-->
+            <!--<groupId>tk.mybatis</groupId>-->
+            <!--<artifactId>mapper-spring-boot-starter</artifactId>-->
+        <!--</dependency>-->
         <dependency>
-            <groupId>tk.mybatis</groupId>
-            <artifactId>mapper-spring-boot-starter</artifactId>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.mybatis</groupId>
+            <artifactId>mybatis-spring</artifactId>
         </dependency>
         <!-- pagehelper（分页）支持 -->
         <dependency>
