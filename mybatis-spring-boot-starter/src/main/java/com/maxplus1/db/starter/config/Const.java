@@ -7,6 +7,8 @@ public class Const {
         SqlSessionFactory("SqlSessionFactory"),
         MyBatisConfiguration("MyBatisConfiguration"),
         SqlSessionTemplate("SqlSessionTemplate"),
+        SqlSessionFactoryBean("SqlSessionFactoryBean"),
+        MapperScannerConfigurer("MapperScannerConfigurer"),
         ;
 
         private String val;
@@ -23,6 +25,7 @@ public class Const {
     public enum PROP_PREFIX{
         MyBatis("spring.maxplus1.mybatis.data-sources"),
         Druid("spring.maxplus1.druid.data-sources"),
+        MyBatisCommon("spring.maxplus1.mybatis"),
         ;
 
         private String val;
