@@ -58,18 +58,30 @@ public class SqlSessionFactoryConfiguration {
                 // 注册 BeanDefinition
                 String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
 
-                // 添加参数
-                BeanDefinition beanDefinition =
-                        genericSqlSessionFactoryBeanDefinition(camelName);
+                // 声明SqlSessionFactoryBean
                 BeanDefinition factoryBeanBeanDefinition =
                         genericSqlSessionFactoryBeanBeanDefinition(camelName);
                 registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.SqlSessionFactoryBean.val(),factoryBeanBeanDefinition);
+                // 声明SqlSessionFactory，通过SqlSessionFactoryBean的实例工厂创建
+                BeanDefinition beanDefinition =
+                        genericSqlSessionFactoryBeanDefinition(camelName);
                 registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.SqlSessionFactory.val(), beanDefinition);
 
             });
         }
 
 
+    }
+
+    /**
+     * @param camelName
+     * @return
+     */
+    private static BeanDefinition genericSqlSessionFactoryBeanBeanDefinition(String camelName ) {
+        return BeanDefinitionBuilder.genericBeanDefinition(SqlSessionFactoryBeanWrapper.class)
+                .addPropertyReference("dataSource",camelName+Const.BEAN_SUFFIX.DataSource.val())
+                .addPropertyReference("configuration",camelName+Const.BEAN_SUFFIX.MyBatisConfiguration.val())
+                .getBeanDefinition();
     }
 
 
@@ -84,17 +96,7 @@ public class SqlSessionFactoryConfiguration {
                 .getBeanDefinition();
     }
 
-    /**
-     * 构造工厂注入
-     * @param camelName
-     * @return
-     */
-    private static BeanDefinition genericSqlSessionFactoryBeanBeanDefinition(String camelName ) {
-        return BeanDefinitionBuilder.genericBeanDefinition(SqlSessionFactoryBeanWrapper.class)
-                .addPropertyReference("dataSource",camelName+Const.BEAN_SUFFIX.DataSource.val())
-                .addPropertyReference("configuration",camelName+Const.BEAN_SUFFIX.MyBatisConfiguration.val())
-                .getBeanDefinition();
-    }
+
 
 
 
