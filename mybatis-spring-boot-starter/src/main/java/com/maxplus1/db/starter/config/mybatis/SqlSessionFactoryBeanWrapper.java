@@ -15,7 +15,7 @@ import java.util.List;
 @Data
 public class SqlSessionFactoryBeanWrapper extends SqlSessionFactoryBean {
 
-    private String[] mapperLocationsStr;
+    private String[] mapperLocations;
 
     @Override
     public void afterPropertiesSet() throws Exception {
@@ -31,8 +31,8 @@ public class SqlSessionFactoryBeanWrapper extends SqlSessionFactoryBean {
     public Resource[] resolveMapperLocations() {
         ResourcePatternResolver resourceResolver = new PathMatchingResourcePatternResolver();
         List<Resource> resources = new ArrayList<Resource>();
-        if (this.mapperLocationsStr != null) {
-            for (String mapperLocation : this.mapperLocationsStr) {
+        if (this.mapperLocations != null) {
+            for (String mapperLocation : this.mapperLocations) {
                 try {
                     Resource[] mappers = resourceResolver.getResources(mapperLocation);
                     resources.addAll(Arrays.asList(mappers));

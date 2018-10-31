@@ -8,27 +8,32 @@ management:
   address: 127.0.0.1
 
 spring:
-    autoconfigure:
-      exclude:
-        - com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceAutoConfigure
-        - org.mybatis.spring.boot.autoconfigure.MybatisAutoConfiguration
     maxplus1:
       druid: # 公共属性
         driver-class-name: org.h2.Driver
-        username: root
-        password: 123456
         data-sources: # 数据源个性化配置
           master: # 注册的DataSource名字为：masterDataSource
-            url: jdbc:h2:file:./master
+            username: h2-master
+            password: m123
+            url: jdbc:h2:mem:master
+            schema: classpath:db/master/schema.sql
+            data: classpath:db/master/data.sql
           slave:
-            url: jdbc:h2:file:./slave
+            username: h2-slave
+            password: s123
+            url: jdbc:h2:mem:slave
+            schema: classpath:db/slave/schema.sql
+            data: classpath:db/slave/data.sql
       mybatis: # 公共属性
+          type-aliases-package: com.maxplus1.demo.data.entity
           configuration:
               map-underscore-to-camel-case: true
               default-fetch-size: 100
               default-statement-timeout: 30
           data-sources:
             master: # 数据源+MyBatis个性化配置
-              type-aliases-package: com.maxplus1.demo.data.entity
-              mapper-locations-str: classpath:mapper/maxplusdb/*.xml # 可以输入数组 mapper-locations Spring Boot默认的Resource[] 解析不符合MyBatis的情况，通过字符串数组进行转换
-              base-package: com.maxplus1.demo.data.dao
+              mapper-locations: classpath:mapper/maxplusdb/*.xml # 可以输入数组
+              base-package: com.maxplus1.demo.data.dao.master
+            slave: # 数据源+MyBatis个性化配置
+              mapper-locations: classpath:mapper/maxplusdb/*.xml # 可以输入数组
+              base-package: com.maxplus1.demo.data.dao.slave

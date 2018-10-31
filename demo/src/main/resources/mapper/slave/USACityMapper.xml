@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.maxplus1.demo.data.dao.slave.IUSACityDao">
+
+    <select id="getUSACityList" resultType="com.maxplus1.demo.data.entity.USACity">
+        SELECT name, state, country from city
+    </select>
+
+</mapper>

@@ -20,3 +20,7 @@ public Map<String,Bean> manyBeans(){
 https://jira.spring.io/browse/SPR-17441
 # PS
 多数据源的注入已经实现
+
+#  
+- 基本遵循mybatis-spring-boot-starter和druid-spring-boot-starter的配置格式
+- 如果存在不支持属性，欢迎提issue
