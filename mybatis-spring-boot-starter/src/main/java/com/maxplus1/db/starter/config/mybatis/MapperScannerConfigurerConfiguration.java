@@ -86,7 +86,10 @@ public class MapperScannerConfigurerConfiguration {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(MapperScannerConfigurerWrapper.class);
         beanDefinitionBuilder.addPropertyValue("basePackage",basePackage);
         beanDefinitionBuilder.addPropertyValue("sqlSessionFactoryBeanName",dataSource+Const.BEAN_SUFFIX.SqlSessionFactory.val());
-        beanDefinitionBuilder.addPropertyValue("sqlSessionTemplateBeanName",dataSource+Const.BEAN_SUFFIX.SqlSessionTemplate.val());
+        /**
+         * sqlSessionTemplateBeanName 和 sqlSessionFactoryBeanName只需要1个，sqlSessionTemplateBeanName优先级更高
+         */
+//        beanDefinitionBuilder.addPropertyValue("sqlSessionTemplateBeanName",dataSource+Const.BEAN_SUFFIX.SqlSessionTemplate.val());
         return   beanDefinitionBuilder
                 .getBeanDefinition();
     }

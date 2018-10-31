@@ -1,6 +1,6 @@
-package com.maxplus1.db.starter.config.mybatis.common.page;
+package com.maxplus1.db.starter.config.common.page;
 
-import com.maxplus1.db.starter.config.mybatis.common.ReqData;
+import com.maxplus1.db.starter.config.common.ReqData;
 import org.apache.ibatis.session.RowBounds;
 
 import javax.servlet.http.HttpServletRequest;

@@ -1,4 +1,4 @@
-package com.maxplus1.db.starter.config.mybatis.common.sp;
+package com.maxplus1.db.starter.config.common.sp;
 
 import lombok.Data;
 

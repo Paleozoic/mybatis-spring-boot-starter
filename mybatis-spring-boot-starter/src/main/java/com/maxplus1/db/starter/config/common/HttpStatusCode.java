@@ -1,4 +1,4 @@
-package com.maxplus1.db.starter.config.mybatis.common;
+package com.maxplus1.db.starter.config.common;
 
 import javax.servlet.http.HttpServletResponse;
 

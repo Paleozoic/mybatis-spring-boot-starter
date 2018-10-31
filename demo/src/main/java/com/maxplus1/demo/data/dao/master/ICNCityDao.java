@@ -4,6 +4,6 @@ import com.maxplus1.demo.data.entity.CNCity;
 
 import java.util.List;
 
-public interface ICNCityDao {
+public interface ICNCityDao  {
     List<CNCity> getCNCityList();
 }
