@@ -10,6 +10,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -24,6 +25,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 import java.util.stream.Stream.Builder;
 
@@ -59,10 +61,12 @@ public class DruidDataSourceConfiguration {
 
         @Override
         public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+            final AtomicBoolean primary= new AtomicBoolean(true);
             this.dataSources.keySet().forEach(dataSourceName -> {
                 // 注册 BeanDefinition
                 String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
-                registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.DataSource.val(), genericDruidBeanDefinition());
+
+                registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.DataSource.val(), genericDruidBeanDefinition(primary.getAndSet(false)));
             });
         }
 
@@ -73,11 +77,13 @@ public class DruidDataSourceConfiguration {
      *
      * @return BeanDefinition druidBeanDefinition
      */
-    private static BeanDefinition genericDruidBeanDefinition() {
-        return BeanDefinitionBuilder.genericBeanDefinition(DruidDataSourceWrapper.class)
+    private static BeanDefinition genericDruidBeanDefinition(boolean primary) {
+        AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DruidDataSourceWrapper.class)
                 .setInitMethodName("init")
                 .setDestroyMethodName("close")
                 .getBeanDefinition();
+        beanDefinition.setPrimary(primary);
+        return beanDefinition;
     }
 
 

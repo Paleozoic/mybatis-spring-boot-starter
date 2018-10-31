@@ -12,6 +12,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -26,6 +27,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyMap;
@@ -54,13 +56,14 @@ public class SqlSessionFactoryConfiguration {
 
         @Override
         public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+            final AtomicBoolean primary= new AtomicBoolean(true);
             this.dataSources.keySet().forEach(dataSourceName -> {
                 // 注册 BeanDefinition
                 String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
 
                 // 声明SqlSessionFactoryBean
                 BeanDefinition factoryBeanBeanDefinition =
-                        genericSqlSessionFactoryBeanBeanDefinition(camelName);
+                        genericSqlSessionFactoryBeanBeanDefinition(camelName,primary.getAndSet(false));
                 registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.SqlSessionFactoryBean.val(),factoryBeanBeanDefinition);
                 // 声明SqlSessionFactory，通过SqlSessionFactoryBean的实例工厂创建
                 BeanDefinition beanDefinition =
@@ -96,11 +99,13 @@ public class SqlSessionFactoryConfiguration {
      * @param camelName
      * @return
      */
-    private static BeanDefinition genericSqlSessionFactoryBeanBeanDefinition(String camelName ) {
-        return BeanDefinitionBuilder.genericBeanDefinition(SqlSessionFactoryBeanWrapper.class)
-                .addPropertyReference("dataSource",camelName+Const.BEAN_SUFFIX.DataSource.val())
-                .addPropertyReference("configuration",camelName+Const.BEAN_SUFFIX.MyBatisConfiguration.val())
+    private static BeanDefinition genericSqlSessionFactoryBeanBeanDefinition(String camelName,boolean primary ) {
+        AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(SqlSessionFactoryBeanWrapper.class)
+                .addPropertyReference("dataSource", camelName + Const.BEAN_SUFFIX.DataSource.val())
+                .addPropertyReference("configuration", camelName + Const.BEAN_SUFFIX.MyBatisConfiguration.val())
                 .getBeanDefinition();
+        beanDefinition.setPrimary(primary);
+        return beanDefinition;
     }
 
 

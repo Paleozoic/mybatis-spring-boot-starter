@@ -7,6 +7,7 @@ import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
 import org.springframework.boot.context.properties.bind.Bindable;
@@ -20,6 +21,7 @@ import org.springframework.core.type.AnnotationMetadata;
 import org.springframework.util.StringUtils;
 
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyMap;
@@ -49,12 +51,13 @@ public class SqlSessionTemplateConfiguration {
 
         @Override
         public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+            final AtomicBoolean primary= new AtomicBoolean(true);
             this.dataSources.keySet().forEach(dataSourceName -> {
                 // 注册 BeanDefinition
                 String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
                 // 添加数据源
                 BeanDefinition beanDefinition =
-                        genericSqlSessionTemplateBeanDefinition(camelName+Const.BEAN_SUFFIX.SqlSessionFactory.val());
+                        genericSqlSessionTemplateBeanDefinition(camelName+Const.BEAN_SUFFIX.SqlSessionFactory.val(),primary.getAndSet(false));
                 // 注册以 DataSource Name 为别名的SqlSessionTemplate  用于@Transactional
                 if (!StringUtils.endsWithIgnoreCase(camelName, Const.BEAN_SUFFIX.DataSource.val())) {
                     registry.registerAlias(camelName+Const.BEAN_SUFFIX.DataSource.val(), camelName);
@@ -74,11 +77,12 @@ public class SqlSessionTemplateConfiguration {
      *
      * @return BeanDefinition
      */
-    private static BeanDefinition genericSqlSessionTemplateBeanDefinition(String sqlSessionFactoryBeanName) {
+    private static BeanDefinition genericSqlSessionTemplateBeanDefinition(String sqlSessionFactoryBeanName,boolean primary) {
         BeanDefinitionBuilder beanDefinitionBuilder = BeanDefinitionBuilder.genericBeanDefinition(SqlSessionTemplate.class);
         beanDefinitionBuilder.addConstructorArgReference(sqlSessionFactoryBeanName);
-        return   beanDefinitionBuilder
-                .getBeanDefinition();
+        AbstractBeanDefinition beanDefinition = beanDefinitionBuilder.getBeanDefinition();
+        beanDefinition.setPrimary(primary);
+        return  beanDefinition;
     }
 
 
