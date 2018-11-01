@@ -18,6 +18,9 @@ public Map<String,Bean> manyBeans(){
 [Spring Boot Issue](https://github.com/spring-projects/spring-boot/issues/14978)
 [Spring Issue](https://jira.spring.io/browse/SPR-17441)
 
+# 注意
+- 所有的bean，比如`PageInterceptor`  、`DruidDataSource` 、 `SqlSessionFactory` 、 `TransactionManager`等，所有注入的BeanName都是：数据源+类名。例如：`xxxTransactionManager`，`xxx`表示数据源的名字
+- 但是`xxxTransactionManager`起了别名`xxx`，方便处理事务。用于`@Transactional('xxx')`
 
 #  PS
 - 基本遵循mybatis-spring-boot-starter和druid-spring-boot-starter的配置格式
