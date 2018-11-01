@@ -1,11 +1,9 @@
 # 写在前面
 
-pagination &  druid & mybatis for multi datasources(event different dialects),all in one strarter~
-此工具通过一个starter直接开启多数据源（支持不同方言）的druid+mybatis+分页的工程，非常方便于复用~
-
-需了大量的BeanDefinition，可能有缺少的属性。
-
-如果@Bean可以一次性返回多个Bean并且注册到Spring容器，
+- pagination &  druid & mybatis for multi datasources(event different dialects),all in one strarter~
+- 此工具通过一个starter直接开启多数据源（支持不同方言）的druid+mybatis+分页的工程，非常方便于复用~
+- 需了大量的BeanDefinition，可能有缺少的属性。
+>   如果@Bean可以一次性返回多个Bean并且注册到Spring容器，
 则可以作出大量简化，并复用大量的starter。
 比如：
 ```java
@@ -16,7 +14,6 @@ public Map<String,Bean> manyBeans(){
     return beans;
 }
 ```
-
 详情看我提的 :
 [Spring Boot Issue](https://github.com/spring-projects/spring-boot/issues/14978)
 [Spring Issue](https://jira.spring.io/browse/SPR-17441)
