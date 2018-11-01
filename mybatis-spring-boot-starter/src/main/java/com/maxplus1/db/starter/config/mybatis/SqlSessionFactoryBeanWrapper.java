@@ -25,6 +25,10 @@ public class SqlSessionFactoryBeanWrapper extends SqlSessionFactoryBean {
 
     @Override
     public SqlSessionFactory getObject() throws Exception {
+        /**
+         * super.afterPropertiesSet(); 必须加 否则不生成MapperStatements  坑啊！！！
+         */
+        super.afterPropertiesSet();
         return super.getObject();
     }
 

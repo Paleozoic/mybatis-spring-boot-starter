@@ -21,7 +21,6 @@ public class CityRest {
 
     @GetMapping("hw")
     public void hw()   {
-
         List<CNCity> cnCityList = cityService.getCNCityList();
         List<USACity> usaCityList = cityService.getUSACityList();
         System.out.println(cnCityList);
