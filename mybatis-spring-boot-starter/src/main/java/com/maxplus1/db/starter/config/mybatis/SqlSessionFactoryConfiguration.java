@@ -103,6 +103,8 @@ public class SqlSessionFactoryConfiguration {
         AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(SqlSessionFactoryBeanWrapper.class)
                 .addPropertyReference("dataSource", camelName + Const.BEAN_SUFFIX.DataSource.val())
                 .addPropertyReference("configuration", camelName + Const.BEAN_SUFFIX.MyBatisConfiguration.val())
+                //MyBatis拦截器
+                .addPropertyReference("plugins",camelName + Const.BEAN_SUFFIX.PageInterceptor.val())
                 .getBeanDefinition();
         beanDefinition.setPrimary(primary);
         return beanDefinition;

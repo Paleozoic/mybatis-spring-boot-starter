@@ -19,7 +19,7 @@ public class SqlSessionFactoryBeanWrapper extends SqlSessionFactoryBean {
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        super.afterPropertiesSet();
+//        super.afterPropertiesSet(); // 和下面getObject()重复执行了
         super.setMapperLocations(resolveMapperLocations());
     }
 
