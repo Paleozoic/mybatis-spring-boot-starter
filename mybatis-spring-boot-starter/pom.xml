@@ -34,8 +34,8 @@
 
         <!-- mybatis支持 -->
         <!--<dependency>-->
-            <!--<groupId>tk.mybatis</groupId>-->
-            <!--<artifactId>mapper-spring-boot-starter</artifactId>-->
+        <!--<groupId>tk.mybatis</groupId>-->
+        <!--<artifactId>mapper-spring-boot-starter</artifactId>-->
         <!--</dependency>-->
         <dependency>
             <groupId>org.mybatis</groupId>
@@ -47,8 +47,8 @@
         </dependency>
         <!-- pagehelper（分页）支持 -->
         <!--<dependency>-->
-            <!--<groupId>com.github.pagehelper</groupId>-->
-            <!--<artifactId>pagehelper-spring-boot-starter</artifactId>-->
+        <!--<groupId>com.github.pagehelper</groupId>-->
+        <!--<artifactId>pagehelper-spring-boot-starter</artifactId>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.github.pagehelper</groupId>
@@ -60,8 +60,8 @@
         </dependency>
         <!-- druid连接池支持 -->
         <!--<dependency>-->
-            <!--<groupId>com.alibaba</groupId>-->
-            <!--<artifactId>druid-spring-boot-starter</artifactId>-->
+        <!--<groupId>com.alibaba</groupId>-->
+        <!--<artifactId>druid-spring-boot-starter</artifactId>-->
         <!--</dependency>-->
         <dependency>
             <groupId>com.alibaba</groupId>
@@ -92,15 +92,33 @@
         </pluginManagement>
     </build>
 
+    <scm>
+        <connection>scm:git:https://github.com/Paleozoic/mybatis-spring-boot-starter.git</connection>
+        <developerConnection>scm:git:https://github.com/Paleozoic/mybatis-spring-boot-starter.git</developerConnection>
+        <url>https://github.com/Paleozoic/mybatis-spring-boot-starter</url>
+    </scm>
+    <licenses>
+        <license>
+            <name>The Apache License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+        </license>
+    </licenses>
+    <developers>
+        <developer>
+            <name>Paleo</name>
+            <email>573793638@qq.com</email>
+            <url>http://maxplus1.com</url>
+        </developer>
+    </developers>
+
     <distributionManagement>
         <snapshotRepository>
-            <id>user-snapshot</id>
-            <url>${deploy2maven.url.snapshots}</url>
-            <uniqueVersion>true</uniqueVersion>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
         </snapshotRepository>
         <repository>
-            <id>user-release</id>
-            <url>${deploy2maven.url.snapshots}</url>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
 </project>

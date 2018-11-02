@@ -1,135 +1,128 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.maxplus1</groupId>
-	<artifactId>mybatis-spring-boot-starter-parent</artifactId>
-	<version>1.0.0-SNAPSHOT</version>
+    <groupId>com.maxplus1</groupId>
+    <artifactId>mybatis-spring-boot-starter-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
     <modules>
         <module>mybatis-spring-boot-starter</module>
-	</modules>
+    </modules>
     <packaging>pom</packaging>
 
-	<name>parent</name>
-	<description>parent</description>
+    <name>parent</name>
+    <description>parent</description>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.0.0.RELEASE</version>
-	</parent>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.0.0.RELEASE</version>
+    </parent>
 
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-		<java.version>1.8</java.version>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
 
-		<toolsjar>${env.JAVA_HOME}/lib/tools.jar</toolsjar>
-		<jconsolejar>${env.JAVA_HOME}/lib/jconsole.jar</jconsolejar>
+        <toolsjar>${env.JAVA_HOME}/lib/tools.jar</toolsjar>
+        <jconsolejar>${env.JAVA_HOME}/lib/jconsole.jar</jconsolejar>
 
-		<spring.boot.version>2.0.0.RELEASE</spring.boot.version>
-		<shiro.spring.boot.web.starter.version>1.4.0</shiro.spring.boot.web.starter.version>
+        <spring.boot.version>2.0.0.RELEASE</spring.boot.version>
+    </properties>
 
-		<deploy2maven.url.snapshots>http://192.168.0.1:8081/repository/maven-snapshots/</deploy2maven.url.snapshots>
-		<deploy2maven.url.releases>http://192.168.0.1:8081/repository/maven-releases/</deploy2maven.url.releases>
-	</properties>
-
-	<dependencies>
+    <dependencies>
 
 
+    </dependencies>
 
-	</dependencies>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
+            <!-- web支持 -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-web</artifactId>
+                <version>${spring.boot.version}</version>
+            </dependency>
 
-	<dependencyManagement>
-		<dependencies>
+            <!-- mybatis支持 -->
+            <!--<dependency>-->
+            <!--<groupId>tk.mybatis</groupId>-->
+            <!--<artifactId>mapper-spring-boot-starter</artifactId>-->
+            <!--<version>1.1.4</version>-->
+            <!--</dependency>-->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>3.4.6</version>
+            </dependency>
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis-spring</artifactId>
+                <version>1.3.2</version>
+            </dependency>
+            <!-- pagehelper（分页）支持 -->
+            <!--<dependency>-->
+            <!--<groupId>com.github.pagehelper</groupId>-->
+            <!--<artifactId>pagehelper-spring-boot-starter</artifactId>-->
+            <!--<version>1.2.9</version>-->
+            <!--</dependency>-->
+            <dependency>
+                <groupId>com.github.pagehelper</groupId>
+                <artifactId>pagehelper</artifactId>
+                <version>5.1.1</version>
+            </dependency>
+            <!-- druid连接池支持 -->
+            <!--<dependency>-->
+            <!--<groupId>com.alibaba</groupId>-->
+            <!--<artifactId>druid-spring-boot-starter</artifactId>-->
+            <!--<version>1.1.10</version>-->
+            <!--</dependency>-->
+            <dependency>
+                <groupId>com.alibaba</groupId>
+                <artifactId>druid</artifactId>
+                <version>1.1.10</version>
+            </dependency>
 
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter</artifactId>
-				<version>${spring.boot.version}</version>
-			</dependency>
-			<!-- web支持 -->
-			<dependency>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-starter-web</artifactId>
-				<version>${spring.boot.version}</version>
-			</dependency>
+            <!-- dev tools -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.2</version>
+                <scope>compile</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
-			<!-- mybatis支持 -->
-			<!--<dependency>-->
-				<!--<groupId>tk.mybatis</groupId>-->
-				<!--<artifactId>mapper-spring-boot-starter</artifactId>-->
-				<!--<version>1.1.4</version>-->
-			<!--</dependency>-->
-			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis</artifactId>
-				<version>3.4.6</version>
-			</dependency>
-			<dependency>
-				<groupId>org.mybatis</groupId>
-				<artifactId>mybatis-spring</artifactId>
-				<version>1.3.2</version>
-			</dependency>
-			<!-- pagehelper（分页）支持 -->
-			<!--<dependency>-->
-				<!--<groupId>com.github.pagehelper</groupId>-->
-				<!--<artifactId>pagehelper-spring-boot-starter</artifactId>-->
-				<!--<version>1.2.9</version>-->
-			<!--</dependency>-->
-			<dependency>
-				<groupId>com.github.pagehelper</groupId>
-				<artifactId>pagehelper</artifactId>
-				<version>5.1.1</version>
-			</dependency>
-			<!-- druid连接池支持 -->
-			<!--<dependency>-->
-				<!--<groupId>com.alibaba</groupId>-->
-				<!--<artifactId>druid-spring-boot-starter</artifactId>-->
-				<!--<version>1.1.10</version>-->
-			<!--</dependency>-->
-			<dependency>
-				<groupId>com.alibaba</groupId>
-				<artifactId>druid</artifactId>
-				<version>1.1.10</version>
-			</dependency>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
-			<!-- dev tools -->
-			<dependency>
-				<groupId>org.projectlombok</groupId>
-				<artifactId>lombok</artifactId>
-				<version>1.18.2</version>
-				<scope>compile</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
-
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<groupId>org.apache.maven.plugins</groupId>
-					<artifactId>maven-compiler-plugin</artifactId>
-					<configuration>
-						<source>${java.version}</source>
-						<target>${java.version}</target>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-	</build>
-
-	<distributionManagement>
-		<snapshotRepository>
-			<id>user-snapshot</id>
-			<url>${deploy2maven.url.snapshots}</url>
-			<uniqueVersion>true</uniqueVersion>
-		</snapshotRepository>
-		<repository>
-			<id>user-release</id>
-			<url>${deploy2maven.url.snapshots}</url>
-		</repository>
-	</distributionManagement>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+        <repository>
+            <id>oss</id>
+            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+        </repository>
+    </distributionManagement>
 
 </project>
