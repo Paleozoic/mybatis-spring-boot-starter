@@ -19,6 +19,8 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.context.annotation.ImportSelector;
+import org.springframework.core.Ordered;
+import org.springframework.core.PriorityOrdered;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -92,11 +94,15 @@ public class DruidDataSourceConfiguration {
      *
      * @author trang
      */
-    static class DruidDataSourceBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
+    static class DruidDataSourceBeanPostProcessor implements EnvironmentAware, BeanPostProcessor, PriorityOrdered {
 
         private final List<BeanCustomizer<DruidDataSource>> customizers;
         private Environment environment;
         private Map<String, Object> dataSources;
+
+        public DruidDataSourceBeanPostProcessor() {
+            this.customizers = new ArrayList<>();
+        }
 
         public DruidDataSourceBeanPostProcessor(ObjectProvider<List<BeanCustomizer<DruidDataSource>>> customizers) {
             this.customizers = customizers.getIfAvailable(ArrayList::new);
@@ -131,6 +137,11 @@ public class DruidDataSourceConfiguration {
             return bean;
         }
 
+        @Override
+        public int getOrder() {
+//            return Ordered.HIGHEST_PRECEDENCE;
+            return 0;
+        }
     }
 
     /**
