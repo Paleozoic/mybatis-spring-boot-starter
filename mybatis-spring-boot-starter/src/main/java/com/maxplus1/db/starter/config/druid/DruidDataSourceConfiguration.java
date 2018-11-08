@@ -91,7 +91,7 @@ public class DruidDataSourceConfiguration {
 
     /**
      * DruidDataSource 的 Bean 处理器，将各数据源的自定义配置绑定到 Bean
-     *
+     * 实现PriorityOrdered接口，使数据源BeanPostProcessor优先加载
      * @author trang
      */
     static class DruidDataSourceBeanPostProcessor implements EnvironmentAware, BeanPostProcessor, PriorityOrdered {
@@ -100,6 +100,9 @@ public class DruidDataSourceConfiguration {
         private Environment environment;
         private Map<String, Object> dataSources;
 
+        /**
+         * 由于优先加载，会使用默认的构造器。原因待查
+         */
         public DruidDataSourceBeanPostProcessor() {
             this.customizers = new ArrayList<>();
         }
