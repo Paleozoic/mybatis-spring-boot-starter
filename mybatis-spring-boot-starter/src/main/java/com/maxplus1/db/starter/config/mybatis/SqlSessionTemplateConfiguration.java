@@ -58,10 +58,6 @@ public class SqlSessionTemplateConfiguration {
                 // 添加数据源
                 BeanDefinition beanDefinition =
                         genericSqlSessionTemplateBeanDefinition(camelName+Const.BEAN_SUFFIX.SqlSessionFactory.val(),primary.getAndSet(false));
-                // 注册以 DataSource Name 为别名的SqlSessionTemplate  用于@Transactional
-                if (!StringUtils.endsWithIgnoreCase(camelName, Const.BEAN_SUFFIX.DataSource.val())) {
-                    registry.registerAlias(camelName+Const.BEAN_SUFFIX.DataSource.val(), camelName);
-                }
                 registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.SqlSessionTemplate.val(), beanDefinition);
 
             });

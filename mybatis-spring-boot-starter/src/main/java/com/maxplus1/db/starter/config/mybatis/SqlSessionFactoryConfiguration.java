@@ -21,6 +21,7 @@ import org.springframework.context.EnvironmentAware;
 import org.springframework.context.annotation.Import;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.context.annotation.ImportSelector;
+import org.springframework.core.PriorityOrdered;
 import org.springframework.core.env.Environment;
 import org.springframework.core.type.AnnotationMetadata;
 
@@ -130,11 +131,15 @@ public class SqlSessionFactoryConfiguration {
      * Bean 处理器，将各数据源的自定义配置绑定到 Bean
      *
      */
-    static class SqlSessionFactoryBeanPostProcessor implements EnvironmentAware, BeanPostProcessor {
+    static class SqlSessionFactoryBeanPostProcessor implements EnvironmentAware, BeanPostProcessor, PriorityOrdered {
 
-        private final List<BeanCustomizer<SqlSessionFactoryBean>> customizers;
+        private  List<BeanCustomizer<SqlSessionFactoryBean>> customizers;
         private Environment environment;
         private Map<String, Object> dataSources;
+
+        public SqlSessionFactoryBeanPostProcessor() {
+            this.customizers = new ArrayList<>();
+        }
 
         public SqlSessionFactoryBeanPostProcessor(ObjectProvider<List<BeanCustomizer<SqlSessionFactoryBean>>> customizers) {
             this.customizers = customizers.getIfAvailable(ArrayList::new);
@@ -150,9 +155,9 @@ public class SqlSessionFactoryConfiguration {
 
         @Override
         public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
-            if (bean instanceof SqlSessionFactoryBean) {
+            if (bean instanceof SqlSessionFactoryBeanWrapper) {
                 // 获取SqlSessionFactoryBean
-                SqlSessionFactoryBean sqlSessionFactoryBean = (SqlSessionFactoryBean) bean;
+                SqlSessionFactoryBeanWrapper sqlSessionFactoryBean = (SqlSessionFactoryBeanWrapper) bean;
                 // 将 'spring.maxplus1.druid.data-sources.${name}' 的配置绑定到 Bean
                 if (!dataSources.isEmpty()) {
                     Binder.get(environment).bind(Const.PROP_PREFIX.MyBatis.val() + "." + StringUtils.getFirstCamelName(beanName), Bindable.ofInstance(sqlSessionFactoryBean));
@@ -169,6 +174,10 @@ public class SqlSessionFactoryConfiguration {
         }
 
 
+        @Override
+        public int getOrder() {
+            return 1;
+        }
     }
 
 
