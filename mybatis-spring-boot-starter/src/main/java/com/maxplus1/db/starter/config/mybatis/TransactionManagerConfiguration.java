@@ -59,8 +59,8 @@ public class TransactionManagerConfiguration {
                 BeanDefinition beanDefinition =
                         genericTransactionManagerBeanDefinition(camelName+Const.BEAN_SUFFIX.DataSource.val(),primary.getAndSet(false));
                 // 注册以 DataSource Name 为别名的TransactionManager  用于@Transactional
-                if (!StringUtils.endsWithIgnoreCase(camelName, Const.BEAN_SUFFIX.DataSource.val())) {
-                    registry.registerAlias(camelName+Const.BEAN_SUFFIX.DataSource.val(), camelName);
+                if (!StringUtils.endsWithIgnoreCase(camelName, Const.BEAN_SUFFIX.TransactionManager.val())) {
+                    registry.registerAlias(camelName+Const.BEAN_SUFFIX.TransactionManager.val(), camelName);
                 }
                 registry.registerBeanDefinition(camelName+ Const.BEAN_SUFFIX.TransactionManager.val(), beanDefinition);
 
