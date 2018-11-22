@@ -5,6 +5,9 @@ import org.apache.ibatis.session.RowBounds;
 
 import javax.servlet.http.HttpServletRequest;
 
+/**
+ * 分页工具，处理ReqData，转化为分页参数：RowBounds
+ */
 public class PageUtils {
 
 	/**
