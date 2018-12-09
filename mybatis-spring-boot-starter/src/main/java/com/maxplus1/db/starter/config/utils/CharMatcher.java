@@ -7,8 +7,6 @@ import java.util.regex.Pattern;
 
 /**
  * 变量名转换工具
- *
- * @author trang
  */
 public final class CharMatcher {
 

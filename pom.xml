@@ -5,7 +5,7 @@
 
     <groupId>com.maxplus1</groupId>
     <artifactId>mybatis-spring-boot-starter-parent</artifactId>
-    <version>1.0.7</version>
+    <version>2.0.0</version>
     <modules>
         <module>mybatis-spring-boot-starter</module>
     </modules>
