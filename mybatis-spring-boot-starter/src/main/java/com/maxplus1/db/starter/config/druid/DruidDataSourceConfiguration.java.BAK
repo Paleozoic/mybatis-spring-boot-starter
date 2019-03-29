@@ -1,0 +1,110 @@
+package com.maxplus1.db.starter.config.druid;
+
+import com.alibaba.druid.pool.DruidDataSource;
+import com.maxplus1.db.starter.config.Const;
+import com.maxplus1.db.starter.config.utils.CharMatcher;
+import com.maxplus1.db.starter.config.utils.StringUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.config.BeanDefinition;
+import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.beans.factory.support.AbstractBeanDefinition;
+import org.springframework.beans.factory.support.BeanDefinitionBuilder;
+import org.springframework.beans.factory.support.BeanDefinitionRegistry;
+import org.springframework.boot.context.properties.bind.Bindable;
+import org.springframework.boot.context.properties.bind.Binder;
+import org.springframework.context.EnvironmentAware;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
+import org.springframework.core.PriorityOrdered;
+import org.springframework.core.env.Environment;
+import org.springframework.core.type.AnnotationMetadata;
+
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static java.util.Collections.emptyMap;
+
+/**
+ * Druid 数据源配置
+ * postProcessBeforeInitialization在加载Shiro相关类的时候不执行
+ * 有时候又可以（比如demo）
+ * 改造工程引入时不可以
+ */
+@Configuration
+@Slf4j
+public class DruidDataSourceConfiguration implements EnvironmentAware, ImportBeanDefinitionRegistrar, BeanPostProcessor, PriorityOrdered {
+
+
+    /**
+     * 多数据源注册
+     * 加载顺序：EnvironmentAware=>ImportBeanDefinitionRegistrar=>ApplicationContextAware
+     * 读取环境配置=》注册Bean=》生成上下文
+     */
+    private Environment environment;
+    private Map<String, Object> Druid;
+
+
+    @Override
+    public void setEnvironment(Environment environment) {
+        this.environment = environment;
+        this.Druid = Binder.get(environment)
+                .bind(Const.PROP_PREFIX.Druid.val(), Bindable.mapOf(String.class, Object.class))
+                .orElse(emptyMap());
+    }
+
+    @Override
+    public void registerBeanDefinitions(AnnotationMetadata metadata, BeanDefinitionRegistry registry) {
+        final AtomicBoolean primary = new AtomicBoolean(true);
+        this.Druid.keySet().forEach(dataSourceName -> {
+            // 注册 BeanDefinition
+            String camelName = CharMatcher.separatedToCamel().apply(dataSourceName);
+
+            registry.registerBeanDefinition(camelName + Const.BEAN_SUFFIX.DataSource.val(), genericDruidBeanDefinition(primary.getAndSet(false)));
+        });
+    }
+
+    /**
+     * DruidDataSource 的 Bean 处理器，将各数据源的自定义配置绑定到 Bean
+     * 实现PriorityOrdered接口，使数据源BeanPostProcessor优先加载
+     */
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException {
+        if (bean instanceof DruidDataSource) {
+            // 设置 Druid 名称
+            DruidDataSource druidDataSource = (DruidDataSource) bean;
+            druidDataSource.setName(beanName);
+            // 将 'spring.maxplus1.druid.data-sources.${name}' 的配置绑定到 Bean
+            if (!Druid.isEmpty()) {
+                Binder.get(environment).bind(Const.PROP_PREFIX.Druid.val() + "." + StringUtils.getFirstCamelName(beanName), Bindable.ofInstance(druidDataSource));
+            }
+        }
+        return bean;
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
+        return bean;
+    }
+
+    @Override
+    public int getOrder() {
+//            return Ordered.HIGHEST_PRECEDENCE;
+        return 0;
+    }
+
+    /**
+     * 构造 BeanDefinition，通过 DruidDataSourceWrapper 实现继承 'spring.maxplus1.druid' 的配置
+     *
+     * @return BeanDefinition druidBeanDefinition
+     */
+    private static BeanDefinition genericDruidBeanDefinition(boolean primary) {
+        AbstractBeanDefinition beanDefinition = BeanDefinitionBuilder.genericBeanDefinition(DruidDataSourceWrapper.class)
+                .setInitMethodName("init")
+                .setDestroyMethodName("close")
+                .getBeanDefinition();
+        beanDefinition.setPrimary(primary);
+        return beanDefinition;
+    }
+
+}
