@@ -16,7 +16,7 @@ public class BaseData<T> {
     }
 
     public static BaseData fail(Object obj){
-        return new BaseData(true, HttpStatusCode.OK.getCode(),"操作失败",obj);
+        return new BaseData(false, HttpStatusCode.ERROR.getCode(),"操作失败",obj);
     }
 
 
