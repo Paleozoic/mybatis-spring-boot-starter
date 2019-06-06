@@ -37,7 +37,7 @@ public class CtrlOpt {
             return BaseData.success();
         } catch (Exception e) {
             LogUtils.error(log, e);
-            return BaseData.fail();
+            return BaseData.fail(e.getMessage());
         }
     }
 }

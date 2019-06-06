@@ -15,7 +15,7 @@ public class BaseData<T> {
         return new BaseData(true, HttpStatusCode.OK.getCode(),"操作成功",obj);
     }
 
-    public static BaseData fail(Object obj){
+    public static BaseData failT(Object obj){
         return new BaseData(false, HttpStatusCode.ERROR.getCode(),"操作失败",obj);
     }
 
@@ -24,7 +24,8 @@ public class BaseData<T> {
         return new BaseData(true, HttpStatusCode.OK.getCode(),"操作成功",null);
     }
 
-    public static BaseData fail(){
-        return new BaseData(false, HttpStatusCode.ERROR.getCode(),"操作失败",null);
+
+    public static BaseData fail(String str){
+        return new BaseData(false, HttpStatusCode.ERROR.getCode(),str,null);
     }
 }
