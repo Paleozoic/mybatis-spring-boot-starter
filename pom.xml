@@ -5,7 +5,7 @@
 
     <groupId>com.maxplus1</groupId>
     <artifactId>mybatis-spring-boot-starter-parent</artifactId>
-    <version>1.1.3</version>
+    <version>1.2.0</version>
     <modules>
         <module>mybatis-spring-boot-starter</module>
     </modules>
@@ -17,7 +17,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.2.6.RELEASE</version>
+        <version>2.3.4.RELEASE</version>
     </parent>
 
     <properties>
@@ -28,7 +28,7 @@
         <toolsjar>${env.JAVA_HOME}/lib/tools.jar</toolsjar>
         <jconsolejar>${env.JAVA_HOME}/lib/jconsole.jar</jconsolejar>
 
-        <spring.boot.version>2.2.6.RELEASE</spring.boot.version>
+        <spring.boot.version>2.3.4.RELEASE</spring.boot.version>
         <snapshotRepository.url>https://oss.sonatype.org/content/repositories/snapshots/</snapshotRepository.url>
         <repository.url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</repository.url>
     </properties>
@@ -61,12 +61,12 @@
             <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis</artifactId>
-                <version>3.5.4</version>
+                <version>3.5.5</version>
             </dependency>
             <dependency>
                 <groupId>org.mybatis</groupId>
                 <artifactId>mybatis-spring</artifactId>
-                <version>2.0.4</version>
+                <version>2.0.5</version>
             </dependency>
             <!-- pagehelper（分页）支持 -->
             <!--<dependency>-->
@@ -77,7 +77,7 @@
             <dependency>
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper</artifactId>
-                <version>5.1.11</version>
+                <version>5.2.0</version>
             </dependency>
             <!-- druid连接池支持 -->
             <!--<dependency>-->
@@ -88,7 +88,7 @@
             <dependency>
                 <groupId>com.alibaba</groupId>
                 <artifactId>druid</artifactId>
-                <version>1.1.22</version>
+                <version>1.1.24</version>
             </dependency>
 
             <!-- dev tools -->
