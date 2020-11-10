@@ -1,3 +1,4 @@
+# 感觉整合组件的必要性降低了，建议原则是涉及多数据拆分成多个微服务，或许是更加好的方案
 # 写在前面
 
 - pagination &  druid & mybatis for multi datasources(event different dialects),all in one strarter~
